@@ -1,9 +1,5 @@
-(ns day8.re-frame.trace.app-state
-  (:require [reagent.core :as r]
-            [clojure.string :as str]
-
-            [cljs.pprint :refer [pprint]]))
-
+(ns day8.re-frame.trace.devtools-formatters
+  (:require [clojure.string :as str]))
 
 (defn css-munge
   [string]
@@ -36,7 +32,16 @@
     (into (view data) (mapv crawl data))
     (view data)))
 
-(defn tab [data]
-  [:div {:style {:flex "1 0 auto" :width "100%" :height "100%" :display "flex" :flex-direction "column"}}
-    [:div.panel-content-scrollable
-     (crawl data)]])
+(defn header [obj]
+  #js ["div" {} (pr-str obj)])
+
+(defn has-body []
+  true)
+
+(defn body [data]
+  (clj->js (crawl data)))
+
+(defn inject! []
+  (set! (.-devtoolsFormatters js/window) #js [ #js {:header  header
+                                                    :hasBody has-body
+                                                    :body    body}]))
